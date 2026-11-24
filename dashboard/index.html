@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FPS 多账号实时作战看板</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/replay.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">◈</div>
+      <div>
+        <h1>FPS 多账号实时作战看板</h1>
+        <div class="brand-sub" id="statusLine">正在加载最新数据…</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="mode-tabs" role="tablist" aria-label="切换赛事视图">
+        <button id="tabFps" class="mode-tab active" type="button" role="tab" aria-selected="true">🎯 FPS <span id="tabFpsCount" class="tab-count"></span></button>
+        <button id="tabRacing" class="mode-tab" type="button" role="tab" aria-selected="false">🏎️ 赛车 <span id="tabRacingCount" class="tab-count"></span></button>
+      </div>
+      <a id="leaderboardLink" class="btn btn-ghost" href="https://agx.cool/#/competitions/2a97f94f-816a-52b7-b4b8-5925db160245/leaderboard" target="_blank" rel="noopener">
+        AGX 官方排行榜 ↗
+      </a>
+      <label class="auto-toggle" title="开启后每 2 分钟自动实时拉取一次（仅只读 GET）">
+        <input type="checkbox" id="autoRefreshToggle">
+        <span>自动刷新 (2m)</span>
+      </label>
+      <button id="refreshBtn" class="btn btn-primary" type="button">
+        <span class="spin-icon" id="refreshIcon">↻</span>
+        <span id="refreshLabel">一键实时刷新</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="banner" class="banner" hidden></div>
+
+    <!-- FPS View -->
+    <div id="fpsView">
+      <!-- Section 1: All Accounts Overview -->
+      <section class="section">
+        <div class="section-head">
+          <h2>01 · 全账号实时战况</h2>
+          <span class="section-hint">点击任意账号卡片可筛选下方对局 · 进攻 (T) 与防守 (CT) 独立核算 · 纯只读 GET，不触发任何发布或变更</span>
+        </div>
+        <div id="accountGrid" class="account-grid"></div>
+      </section>
+
+      <!-- Section 2: Detailed Match Ledger -->
+      <section class="section">
+        <div class="section-head">
+          <h2>02 · 近期对局详细战绩</h2>
+          <div class="filters">
+            <div id="accountPills" class="pills"></div>
+            <select id="mapFilter" class="select" aria-label="筛选地图">
+              <option value="">全部地图</option>
+            </select>
+            <select id="outcomeFilter" class="select" aria-label="筛选胜负">
+              <option value="">全部结果</option>
+              <option value="W">仅胜场 (W)</option>
+              <option value="L">仅败场 (L)</option>
+              <option value="live">进行中</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="match-table">
+            <thead>
+              <tr>
+                <th>时间 / 账号</th>
+                <th>地图 / 版本</th>
+                <th>比分 / 评分变化</th>
+                <th>大厅均分 (己 vs 敌)</th>
+                <th>综合 K/D/A · ADR · 命中/爆头</th>
+                <th class="col-t">进攻方 (T)</th>
+                <th class="col-ct">防守方 (CT)</th>
+                <th>目标 / 异常</th>
+                <th class="col-actions">复盘与观战</th>
+              </tr>
+            </thead>
+            <tbody id="matchTbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Racing View (strictly separated from FPS) -->
+    <div id="racingView" hidden>
+      <section class="section">
+        <div class="section-head">
+          <h2>01 · 赛车账号实时战况</h2>
+          <span class="section-hint">点击任意账号卡片切换高亮与下方筛选 · 自动识别已报名赛车的账号 · 与 FPS 战绩严格隔离</span>
+        </div>
+        <div id="racingAccountGrid" class="account-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>02 · 全局与个人分数变化走势</h2>
+          <span id="racingChartHint" class="section-hint">全局对比全部赛车账号 Rating 曲线 · 点击上方账号卡片或下方胶囊聚焦个人趋势</span>
+        </div>
+        <div class="chart-card">
+          <div id="racingGlobalBar" class="global-kpi-strip"></div>
+          <div id="racingChartWrap" class="svg-chart-wrap"></div>
+          <div id="racingDeltaStrip" class="delta-strip"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>03 · 近期赛车对局战绩</h2>
+          <div class="filters">
+            <div id="racingAccountPills" class="pills"></div>
+            <select id="racingPlaceFilter" class="select" aria-label="筛选名次">
+              <option value="">全部名次</option>
+              <option value="1">仅第 1 名 (P1)</option>
+              <option value="3">前三名 (P1–P3)</option>
+              <option value="5">前五名 (P1–P5)</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-card" id="racingTableCard">
+          <table class="match-table" style="min-width:860px;">
+            <thead>
+              <tr>
+                <th>时间 / 账号</th>
+                <th>绑定版本</th>
+                <th>完赛名次</th>
+                <th>个人评分变化 (赛前→赛后 · Δ)</th>
+                <th>当时大厅均分 / 最高分</th>
+                <th>回放与详情</th>
+              </tr>
+            </thead>
+            <tbody id="racingMatchTbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Match Detail Modal (10-player scoreboard + round-by-round timeline) -->
+  <div id="detailModal" class="modal-backdrop" hidden>
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="detailTitle">对局详情</h3>
+          <div id="detailSub" class="muted"></div>
+        </div>
+        <div class="modal-head-actions">
+          <button id="detailOpen2D" class="btn btn-accent" type="button">▶ 打开 2D 战术回放</button>
+          <a id="detailOpenAGX" class="btn btn-ghost" href="#" target="_blank" rel="noopener">AGX 官方 3D 回放 ↗</a>
+          <button id="detailClose" class="btn btn-icon" type="button" aria-label="关闭">✕</button>
+        </div>
+      </div>
+      <div id="detailBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 2D Tactical Replay Theater Modal -->
+  <div id="replayModal" class="modal-backdrop" hidden>
+    <div class="modal modal-theater" role="dialog" aria-modal="true" aria-labelledby="replayTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="replayTitle">2D 战术回放影院</h3>
+          <div id="replaySub" class="muted"></div>
+        </div>
+        <div class="modal-head-actions">
+          <a id="replayOpenAGX" class="btn btn-ghost" href="#" target="_blank" rel="noopener">在 AGX 平台看 3D 渲染 ↗</a>
+          <button id="replayClose" class="btn btn-icon" type="button" aria-label="关闭">✕</button>
+        </div>
+      </div>
+
+      <div id="replayLoading" class="replay-loading" hidden>
+        <div class="loader"></div>
+        <div id="replayLoadingText">正在拉取并解码公开回放帧流（首次加载约需 3–8 秒，之后本地秒开）…</div>
+      </div>
+
+      <div id="replayWorkspace" class="replay-workspace" hidden>
+        <div class="replay-stage-col">
+          <!-- Dedicated Top Status & Legend Strip (never overlaps canvas) -->
+          <div class="stage-hud-bar">
+            <div class="stage-hud-left">
+              <span id="hudRoundInfo" class="hud-chip">R1</span>
+              <span id="hudClock" class="hud-chip hud-clock">0.0s</span>
+              <span id="hudScore" class="hud-chip">0 : 0</span>
+              <span id="hudDirection" class="hud-chip hud-dir" hidden>◀ 倒放中</span>
+              <span id="hudBomb" class="hud-chip hud-bomb" hidden>💣</span>
+              <span id="hudStreamProgress" class="hud-chip hud-stream" hidden>⚡ 缓存中…</span>
+            </div>
+            <div class="stage-legend">
+              <span><i class="dot dot-own"></i>本账号</span>
+              <span><i class="dot dot-t"></i>进攻(T)</span>
+              <span><i class="dot dot-ct"></i>防守(CT)</span>
+              <span><i class="dot dot-bomb"></i>炸弹</span>
+            </div>
+          </div>
+
+          <!-- Round Selector Strip -->
+          <div id="replayRoundBar" class="round-bar"></div>
+
+          <!-- Clean Unobstructed Map Canvas -->
+          <div class="canvas-wrap">
+            <canvas id="replayCanvas" width="900" height="620"></canvas>
+          </div>
+
+          <!-- Dedicated Two-Row Transport Control Deck -->
+          <div class="replay-controls-deck">
+            <div class="timeline-row">
+              <span id="rpCurTime" class="mono time-readout">0.0s</span>
+              <div class="scrubber-wrap">
+                <div id="rpEventMarkers" class="scrubber-markers"></div>
+                <input id="rpScrubber" type="range" min="0" max="100" step="0.05" value="0" aria-label="时间轴">
+              </div>
+              <span id="rpDurTime" class="mono time-readout">0.0s</span>
+            </div>
+
+            <div class="transport-row">
+              <div class="transport-group">
+                <button id="rpPrevRound" class="btn btn-sm" type="button" title="上一回合 (快捷键 [)">⏮ 上回合</button>
+                <button id="rpStepBack" class="btn btn-sm" type="button" title="后退 5 秒 (快捷键 ←)">⏪ -5秒</button>
+                <button id="rpReverseBtn" class="btn btn-sm btn-reverse" type="button" title="向后倒放 (快捷键 R)">◀ 倒放</button>
+                <button id="rpPlayBtn" class="btn btn-sm btn-primary" type="button" title="正向播放/暂停 (快捷键 空格)">▶ 播放</button>
+                <button id="rpStepFwd" class="btn btn-sm" type="button" title="前进 5 秒 (快捷键 →)">⏩ +5秒</button>
+                <button id="rpNextRound" class="btn btn-sm" type="button" title="下一回合 (快捷键 ])">⏭ 下回合</button>
+              </div>
+
+              <div class="transport-group">
+                <label class="speed-label">倍速
+                  <select id="rpSpeed" class="select select-sm" aria-label="倍速">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="4">4x</option>
+                    <option value="8">8x</option>
+                  </select>
+                </label>
+                <label class="chk"><input type="checkbox" id="rpTrails" checked> 轨迹</label>
+                <label class="chk"><input type="checkbox" id="rpCones" checked> 视角</label>
+                <label class="chk"><input type="checkbox" id="rpLabels" checked> 名字</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="replay-side-col">
+          <div class="side-block">
+            <div class="side-title">实时 10 人状态</div>
+            <div id="rpPlayersHud" class="players-hud"></div>
+          </div>
+          <div class="side-block side-events">
+            <div class="side-title">本回合关键事件（点击跳转）</div>
+            <div id="rpEventsList" class="events-list"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+  <!-- 2D Racing Full-Track Multi-Lane Replay Theater Modal -->
+  <div id="raceReplayModal" class="modal-backdrop" hidden>
+    <div class="modal modal-theater" role="dialog" aria-modal="true" aria-labelledby="rcTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="rcTitle">2D 赛车全图多车道回放</h3>
+          <div id="rcSub" class="muted"></div>
+        </div>
+        <div class="modal-head-actions">
+          <a id="rcOpenAGX" class="btn btn-ghost" href="#" target="_blank" rel="noopener">在 AGX 平台看 3D 渲染 ↗</a>
+          <button id="rcClose" class="btn btn-icon" type="button" aria-label="关闭">✕</button>
+        </div>
+      </div>
+
+      <div id="rcLoading" class="replay-loading" hidden>
+        <div class="loader"></div>
+        <div id="rcLoadingText">正在加载赛道与赛车帧流…</div>
+      </div>
+
+      <div id="rcWorkspace" class="replay-workspace" hidden>
+        <div class="replay-stage-col">
+          <div class="stage-hud-bar">
+            <div class="stage-hud-left">
+              <span id="rcHudPhase" class="hud-chip">赛道</span>
+              <span id="rcHudClock" class="hud-chip hud-clock">0.0s</span>
+              <span id="rcHudDir" class="hud-chip hud-dir" hidden>◀ 倒放中</span>
+              <span id="rcHudStream" class="hud-chip hud-stream" hidden>⚡ 缓存中…</span>
+            </div>
+            <div class="stage-legend">
+              <span><i class="dot dot-own"></i>本账号</span>
+              <span><i class="dot dot-ct"></i>多车道赛道</span>
+              <span><i class="dot dot-t"></i>维修区 Pit</span>
+            </div>
+          </div>
+
+          <div id="rcPhaseBar" class="round-bar"></div>
+
+          <div class="canvas-wrap">
+            <canvas id="raceCanvas" width="900" height="620"></canvas>
+          </div>
+
+          <div class="replay-controls-deck">
+            <div class="timeline-row">
+              <span id="rcCurTime" class="mono time-readout">0.0s</span>
+              <div class="scrubber-wrap">
+                <input id="rcScrubber" type="range" min="0" max="100" step="0.1" value="0" aria-label="赛车时间轴">
+              </div>
+              <span id="rcDurTime" class="mono time-readout">0.0s</span>
+            </div>
+
+            <div class="transport-row">
+              <div class="transport-group">
+                <button id="rcStepBack" class="btn btn-sm" type="button">⏪ -5秒</button>
+                <button id="rcRevBtn" class="btn btn-sm btn-reverse" type="button">◀ 倒放</button>
+                <button id="rcPlayBtn" class="btn btn-sm btn-primary" type="button">▶ 播放</button>
+                <button id="rcStepFwd" class="btn btn-sm" type="button">⏩ +5秒</button>
+              </div>
+              <div class="transport-group">
+                <label class="speed-label">倍速
+                  <select id="rcSpeed" class="select select-sm" aria-label="倍速">
+                    <option value="1">1x</option>
+                    <option value="2" selected>2x</option>
+                    <option value="4">4x</option>
+                    <option value="8">8x</option>
+                    <option value="16">16x</option>
+                  </select>
+                </label>
+                <label class="chk"><input type="checkbox" id="rcLabels" checked> 车手标记</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="replay-side-col">
+          <div class="side-block side-events" style="border-bottom:none;">
+            <div class="side-title">实时排位 · 圈数 · 车速 · ERS</div>
+            <div id="rcTimingTower" class="players-hud" style="overflow-y:auto;"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

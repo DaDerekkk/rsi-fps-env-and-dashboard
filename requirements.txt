@@ -1,0 +1,3 @@
+numpy>=1.24
+# Optional: required only for CUDA GpuSim (`sim/gpusim/`)
+# torch>=2.2

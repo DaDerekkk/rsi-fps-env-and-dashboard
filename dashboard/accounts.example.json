@@ -1,0 +1,28 @@
+{
+  "accounts": [
+    {
+      "alias": "main_account",
+      "username": "PlayerMain",
+      "short_username": "Main",
+      "display_name": "Main Account",
+      "role": "primary",
+      "label": "Primary",
+      "fps_agent_ids": [
+        "00000000-0000-0000-0000-000000000001"
+      ],
+      "purpose": "Primary competition account"
+    },
+    {
+      "alias": "alt_account_01",
+      "username": "PlayerAlt01",
+      "short_username": "Alt01",
+      "display_name": "Trial Account 01",
+      "role": "secondary",
+      "label": "Alt-01",
+      "fps_agent_ids": [
+        "00000000-0000-0000-0000-000000000002"
+      ],
+      "purpose": "Isolated secondary trial account"
+    }
+  ]
+}

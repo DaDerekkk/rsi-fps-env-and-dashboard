@@ -1,0 +1,25 @@
+# Local runtime caches & secrets (NEVER commit!)
+dashboard/accounts.json
+dashboard/.cache/
+.cache/
+*.env
+.env*
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Model weights, sealed submissions & private exports
+*.npz
+*.pt
+*.pth
+*.onnx
+*.zip
+!sim/meshes/*.tar.gz
+
+# OS files
+.DS_Store
+Thumbs.db

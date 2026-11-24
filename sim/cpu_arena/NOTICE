@@ -1,0 +1,11 @@
+fpssim ports formulas, tables and logic from cs2-web (https://github.com/apich/cs2-web, commit e0e7e858) by its author,
+used with permission. Modules derived from cs2-web: recoil.py, accuracy.py (+ accuracy_data.json), penetration.py
+(+ penetration_power.json), combat.py (hit volumes), melee.py, meshmove.py, grenades.py, economy/round logic in arena.py,
+player-vs-player resolution in arena.py. gpusim/ is a GPU port of the same modules.
+
+Weapon parameter values (recoil seeds/magnitudes, accuracy, penetration power) originate from Counter-Strike 2 game data
+as extracted by cs2-web. Counter-Strike, Dust II and Mirage are trademarks of Valve Corporation; this project is not
+affiliated with or endorsed by Valve. No Valve map geometry or other game assets are included. tools/mirage_awpy_fetch.py downloads public map geometry from the
+Awpy project (https://github.com/pnxenopoulos/awpy, awpy-data releases); check Awpy's terms before redistributing generated meshes.
+
+catalog.json reproduces the frozen weapon/utility table published in the agx.cool FPS contest documentation.
