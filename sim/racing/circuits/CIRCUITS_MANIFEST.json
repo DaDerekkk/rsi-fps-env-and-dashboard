@@ -1,0 +1,156 @@
+{
+  "parkland": {
+    "url": "https://agx.cool/assets/formula-circuits/parkland.json",
+    "bytes": 314299,
+    "sha256": "bd9de92be1fb12528b40beafb4d259eaa055ba243eab191ae7459e9c5d440a74",
+    "official_length_m": 5793.0,
+    "centerline_nodes": 2898,
+    "pit_entry_s": 5715.9313949727275,
+    "pit_exit_s": 661.9920544912432,
+    "pit_speed_limit_kph": 80.0,
+    "active_aero_zones": [
+      {
+        "id": 1,
+        "start_s": 5715.931514995518,
+        "end_s": 1053.9869895294676,
+        "length_m": 1133.9859093243504,
+        "from_turn": 11,
+        "to_turn": 1
+      },
+      {
+        "id": 2,
+        "start_s": 1959.9765955557766,
+        "end_s": 2269.9723947580956,
+        "length_m": 309.9957992023187,
+        "from_turn": 3,
+        "to_turn": 4
+      },
+      {
+        "id": 3,
+        "start_s": 3099.962912957615,
+        "end_s": 4069.9507906557355,
+        "length_m": 969.9878776981204,
+        "from_turn": 7,
+        "to_turn": 8
+      },
+      {
+        "id": 4,
+        "start_s": 4363.947742076847,
+        "end_s": 5237.936771993759,
+        "length_m": 873.9890299169119,
+        "from_turn": 10,
+        "to_turn": 11
+      }
+    ],
+    "override_detection": [
+      {
+        "id": 1,
+        "detection_s": 5247.936771993759,
+        "activation_s": 5705.931514995518,
+        "detection_gap_s": 1.0,
+        "detection_turn": 11,
+        "activation_turn": 11
+      }
+    ]
+  },
+  "highland": {
+    "url": "https://agx.cool/assets/formula-circuits/highland.json",
+    "bytes": 475671,
+    "sha256": "aac80e7326f6b672edf73359b4b15189db7f068635f475bfb020fc5fb8321234",
+    "official_length_m": 7004.0,
+    "centerline_nodes": 3500,
+    "pit_entry_s": 6609.507079216389,
+    "pit_exit_s": 391.9707677840884,
+    "pit_speed_limit_kph": 80.0,
+    "active_aero_zones": [
+      {
+        "id": 1,
+        "start_s": 6679.502604897627,
+        "end_s": 175.98463817225053,
+        "length_m": 495.96002941905954,
+        "from_turn": 19,
+        "to_turn": 1
+      },
+      {
+        "id": 2,
+        "start_s": 894.9302751992925,
+        "end_s": 954.9302751992925,
+        "length_m": 60.0,
+        "from_turn": 2,
+        "to_turn": 3
+      },
+      {
+        "id": 3,
+        "start_s": 1183.912452496224,
+        "end_s": 2175.835494213518,
+        "length_m": 991.9230417172935,
+        "from_turn": 4,
+        "to_turn": 5
+      },
+      {
+        "id": 4,
+        "start_s": 5111.619533761273,
+        "end_s": 5601.580010612209,
+        "length_m": 489.9604768509362,
+        "from_turn": 15,
+        "to_turn": 16
+      },
+      {
+        "id": 5,
+        "start_s": 6113.544812637948,
+        "end_s": 6529.510807815357,
+        "length_m": 415.96599517740924,
+        "from_turn": 17,
+        "to_turn": 18
+      }
+    ],
+    "override_detection": [
+      {
+        "id": 1,
+        "detection_s": 6639.504842057007,
+        "activation_s": 6669.502604897627,
+        "detection_gap_s": 1.0,
+        "detection_turn": 19,
+        "activation_turn": 19
+      }
+    ]
+  },
+  "crossover": {
+    "url": "https://agx.cool/assets/formula-circuits/crossover.json",
+    "bytes": 433338,
+    "sha256": "08126bb081f5c3f328bc6a1711df5350d4e6ccb7e49c97d9a2c5e724ff30ef03",
+    "official_length_m": 5807.0,
+    "centerline_nodes": 2902,
+    "pit_entry_s": 5355.31315011008,
+    "pit_exit_s": 449.94229229827033,
+    "pit_speed_limit_kph": 80.0,
+    "active_aero_zones": [
+      {
+        "id": 1,
+        "start_s": 5611.281603233135,
+        "end_s": 429.9410099048986,
+        "length_m": 621.9151055587881,
+        "from_turn": 18,
+        "to_turn": 1
+      },
+      {
+        "id": 2,
+        "start_s": 3975.491402788756,
+        "end_s": 4723.390350191061,
+        "length_m": 747.8989474023047,
+        "from_turn": 14,
+        "to_turn": 15
+      }
+    ],
+    "override_detection": [
+      {
+        "id": 1,
+        "detection_s": 5279.3228962997055,
+        "activation_s": 5601.281603233135,
+        "detection_gap_s": 1.0,
+        "detection_turn": 17,
+        "activation_turn": 18
+      }
+    ]
+  }
+}
